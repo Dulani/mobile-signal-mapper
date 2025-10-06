@@ -72,8 +72,7 @@ export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
   return (
     <div className="space-y-6">
       <div>
-        <label className="text-sm font-medium text-muted-foreground">Signal Strength</label>
-        <p className="text-sm text-muted-foreground/80 mb-2">Tap an icon to log your signal.</p>
+        <p className="text-sm text-muted-foreground/80 mb-2">Tap an icon to log your signal strength:</p>
         <div className="grid grid-cols-4 gap-2 mt-2">
           {strengthLevels.map((level) => (
             <Button

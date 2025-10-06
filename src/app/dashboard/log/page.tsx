@@ -37,7 +37,6 @@ export default function LogSignalPage() {
     <div className="flex justify-center items-start p-4 md:p-8">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Log a Signal Point</CardTitle>
           <CardDescription>
             Select the current signal strength and network type, then log your reading. Your location will be automatically recorded.
           </CardDescription>
