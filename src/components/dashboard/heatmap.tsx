@@ -1,99 +1,79 @@
 'use client';
 import type { SignalData } from '@/lib/data';
-import {
-  ScatterChart,
-  Scatter,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Label,
-} from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Vega } from 'react-vega';
+import type { VisualizationSpec } from 'vega-lite';
 
 interface HeatmapProps {
   signalData: SignalData[];
 }
 
-const getDotColor = (strength: number) => {
-  switch (strength) {
-    case 1:
-      return 'hsl(var(--chart-1))';
-    case 2:
-      return 'hsl(var(--chart-4))';
-    case 3:
-      return 'hsl(var(--chart-2))';
-    case 4:
-      return 'hsl(var(--chart-2))';
-    default:
-      return 'hsl(var(--muted-foreground))';
-  }
-};
-
-const CustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload as SignalData;
-    return (
-      <Card>
-        <CardHeader className="p-2">
-            <CardTitle className="text-base">Reading Details</CardTitle>
-        </CardHeader>
-        <CardContent className="p-2 pt-0 text-sm">
-            <p><strong>Strength:</strong> {data.strength}/4</p>
-            <p><strong>Network:</strong> {data.network}</p>
-            <p><strong>Coords:</strong> {data.latitude.toFixed(4)}, {data.longitude.toFixed(4)}</p>
-            <p className="text-xs text-muted-foreground pt-1">{new Date(data.timestamp).toLocaleString()}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-  return null;
-};
-
 export function Heatmap({ signalData }: HeatmapProps) {
-    if (!signalData || signalData.length === 0) {
-        return <p>No data to display.</p>;
-    }
-    
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <ScatterChart
-        margin={{
-          top: 20,
-          right: 40,
-          bottom: 40,
-          left: 40,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-        <XAxis 
-            type="number" 
-            dataKey="longitude" 
-            name="longitude" 
-            domain={['dataMin', 'dataMax']}
-            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-            tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
-        >
-            <Label value="Longitude" offset={-20} position="insideBottom" fill="hsl(var(--foreground))" />
-        </XAxis>
-        <YAxis 
-            type="number" 
-            dataKey="latitude" 
-            name="latitude" 
-            domain={['dataMin', 'dataMax']}
-            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-            tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
-        >
-            <Label value="Latitude" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} fill="hsl(var(--foreground))" />
-        </YAxis>
-        <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-        <Scatter name="Signal Readings" data={signalData} fill="hsl(var(--primary))">
-          {signalData.map((entry, index) => (
-            <circle key={`cell-${index}`} cx={0} cy={0} r={0} fill={getDotColor(entry.strength)} />
-          ))}
-        </Scatter>
-      </ScatterChart>
-    </ResponsiveContainer>
-  );
+  if (!signalData || signalData.length === 0) {
+    return <p>No data to display.</p>;
+  }
+
+  const spec: VisualizationSpec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    description: 'A scatter plot of signal strength readings.',
+    width: 'container',
+    height: 'container',
+    data: {
+      values: signalData,
+    },
+    mark: {
+      type: 'circle',
+      size: 100,
+      opacity: 0.7,
+    },
+    encoding: {
+      x: {
+        field: 'longitude',
+        type: 'quantitative',
+        title: 'Longitude',
+        axis: {
+          labelColor: 'hsl(var(--muted-foreground))',
+          titleColor: 'hsl(var(--foreground))',
+          gridColor: 'hsl(var(--border))',
+        },
+      },
+      y: {
+        field: 'latitude',
+        type: 'quantitative',
+        title: 'Latitude',
+        axis: {
+          labelColor: 'hsl(var(--muted-foreground))',
+          titleColor: 'hsl(var(--foreground))',
+          gridColor: 'hsl(var(--border))',
+        },
+      },
+      color: {
+        field: 'strength',
+        type: 'ordinal',
+        title: 'Signal Strength',
+        scale: {
+          domain: [1, 2, 3, 4],
+          range: ['hsl(var(--chart-1))', 'hsl(var(--chart-4))', 'hsl(var(--chart-2))', 'hsl(var(--chart-2))'],
+        },
+        legend: {
+          labelColor: 'hsl(var(--muted-foreground))',
+          titleColor: 'hsl(var(--foreground))',
+        }
+      },
+      tooltip: [
+        { field: 'strength', type: 'quantitative', title: 'Strength' },
+        { field: 'network', type: 'nominal', title: 'Network' },
+        { field: 'latitude', type: 'quantitative', title: 'Latitude' },
+        { field: 'longitude', type: 'quantitative', title: 'Longitude' },
+        { field: 'timestamp', type: 'temporal', title: 'Time', format: '%Y-%m-%d %H:%M' },
+      ],
+    },
+     background: 'transparent',
+     config: {
+        view: {
+            stroke: 'transparent'
+        }
+     }
+  };
+
+  return <Vega spec={spec} />;
 }
