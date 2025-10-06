@@ -32,7 +32,7 @@ export function Heatmap({ signalData }: HeatmapProps) {
   // Using a key on MapContainer forces a re-render when the center changes, 
   // which is what we want when the data changes. This is a common pattern for react-leaflet.
   return (
-    <MapContainer key={JSON.stringify(center)} center={center} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+    <MapContainer key={Date.now()} center={center} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
