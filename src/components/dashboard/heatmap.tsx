@@ -15,8 +15,6 @@ export function Heatmap({ signalData }: HeatmapProps) {
   const spec: VisualizationSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     description: 'A scatter plot of signal strength readings.',
-    width: 'container',
-    height: 'container',
     data: {
       values: signalData,
     },
@@ -72,6 +70,10 @@ export function Heatmap({ signalData }: HeatmapProps) {
         view: {
             stroke: 'transparent'
         }
+     },
+     autosize: {
+        type: 'fit',
+        contains: 'padding'
      }
   };
 
