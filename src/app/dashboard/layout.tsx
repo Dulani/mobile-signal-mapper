@@ -4,6 +4,7 @@ import {
   SidebarHeader,
   SidebarContent,
   SidebarInset,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/app-logo';
 
