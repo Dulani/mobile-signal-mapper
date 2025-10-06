@@ -3,8 +3,18 @@ import { useState, useEffect } from 'react';
 import { getSignalPoints } from '@/lib/actions';
 import type { SignalData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LeafletHeatmap } from '@/components/dashboard/leaflet-heatmap';
 import { Card, CardContent } from '@/components/ui/card';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the LeafletHeatmap component with SSR turned off
+const LeafletHeatmap = dynamic(
+  () => import('@/components/dashboard/leaflet-heatmap').then(mod => mod.LeafletHeatmap),
+  { 
+    ssr: false,
+    loading: () => <Skeleton className="w-full h-full" />
+  }
+);
+
 
 export default function DashboardPage() {
   const [signalData, setSignalData] = useState<SignalData[]>([]);
