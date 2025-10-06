@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import type { SignalData } from '@/lib/data';
 import { LatLngExpression } from 'leaflet';
+import { useMemo } from 'react';
 
 interface LeafletHeatmapProps {
   signalData: SignalData[];
@@ -20,10 +21,14 @@ const getDotColor = (strength: number) => {
 };
 
 export function LeafletHeatmap({ signalData }: LeafletHeatmapProps) {
-    // Calculate the center of all points to focus the map
-  const centerLat = signalData.reduce((acc, p) => acc + p.latitude, 0) / signalData.length;
-  const centerLng = signalData.reduce((acc, p) => acc + p.longitude, 0) / signalData.length;
-  const center: LatLngExpression = [centerLat, centerLng];
+  const center = useMemo<LatLngExpression>(() => {
+    if (signalData.length === 0) {
+      return [34.0522, -118.2437]; // Default to LA if no data
+    }
+    const centerLat = signalData.reduce((acc, p) => acc + p.latitude, 0) / signalData.length;
+    const centerLng = signalData.reduce((acc, p) => acc + p.longitude, 0) / signalData.length;
+    return [centerLat, centerLng];
+  }, [signalData]);
 
   return (
     <MapContainer center={center} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
