@@ -8,8 +8,31 @@ export type SignalData = {
   timestamp: number;
 };
 
+const generateMockData = (
+  baseLat: number,
+  baseLon: number,
+  count: number,
+  idStart: number
+): SignalData[] => {
+  const data: SignalData[] = [];
+  const networks: SignalData['network'][] = ['T-Mobile', 'Verizon', 'AT&T', 'Other'];
+  for (let i = 0; i < count; i++) {
+    data.push({
+      id: (idStart + i).toString(),
+      userId: 'mock-user',
+      latitude: baseLat + (Math.random() - 0.5) * 0.05,
+      longitude: baseLon + (Math.random() - 0.5) * 0.05,
+      strength: Math.floor(Math.random() * 4) + 1,
+      network: networks[Math.floor(Math.random() * networks.length)],
+      timestamp: new Date().getTime() - Math.random() * 1000 * 60 * 60 * 24 * 7,
+    });
+  }
+  return data;
+};
+
 // Mock data for development
 export const mockSignalData: SignalData[] = [
+  // Original Downtown LA points
   {
     id: '1',
     userId: 'mock-user',
@@ -37,7 +60,7 @@ export const mockSignalData: SignalData[] = [
     network: 'AT&T',
     timestamp: new Date('2023-10-27T10:10:00Z').getTime(),
   },
-    {
+  {
     id: '4',
     userId: 'mock-user',
     latitude: 34.051235,
@@ -46,4 +69,9 @@ export const mockSignalData: SignalData[] = [
     network: 'Verizon',
     timestamp: new Date('2023-10-27T09:55:00Z').getTime(),
   },
+  // New mock data clusters
+  ...generateMockData(34.01, -118.49, 50, 5), // Santa Monica cluster
+  ...generateMockData(34.118, -118.3, 50, 55), // Griffith Observatory cluster
+  ...generateMockData(33.9425, -118.408, 40, 105), // LAX cluster
+  ...generateMockData(34.07, -118.44, 30, 145), // Westwood/UCLA cluster
 ];
