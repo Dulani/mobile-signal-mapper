@@ -1,5 +1,4 @@
 'use client';
-import 'leaflet/dist/leaflet.css';
 import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { getSignalPoints } from '@/lib/actions';
