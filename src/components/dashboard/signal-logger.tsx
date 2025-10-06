@@ -2,18 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { Signal, SignalHigh, SignalLow, SignalMedium } from 'lucide-react';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import type { SignalData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { ChevronDown } from 'lucide-react';
 
 type SignalStrength = 1 | 2 | 3 | 4;
 
@@ -29,88 +26,106 @@ const strengthLevels: {
   { value: 4, icon: Signal, color: 'text-green-500', label: 'Excellent' },
 ];
 
+const carriers: SignalData['network'][] = ['T-Mobile', 'Verizon', 'AT&T', 'Other'];
+
 interface SignalLoggerProps {
   onLogSignal: (data: Omit<SignalData, 'id' | 'userId' | 'timestamp'>) => Promise<void>;
   isSubmitting: boolean;
 }
 
 export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
-  const [strength, setStrength] = useState<SignalStrength | null>(null);
-  const [network, setNetwork] = useState<SignalData['network']>('T-Mobile');
+  const [carrier, setCarrier] = useState<SignalData['network']>('T-Mobile');
+  const [selectedStrength, setSelectedStrength] = useState<SignalStrength | null>(null);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { position, error, isLoading: isGeoLoading, getPosition } = useGeolocation();
   const { toast } = useToast();
 
-  const handleSubmit = () => {
-    if (!strength) {
-      toast({ variant: 'destructive', title: 'Please select a signal strength.' });
-      return;
-    }
-    // We get the position first. The actual submission is handled in the effect below.
+  const handleStrengthClick = (strength: SignalStrength) => {
+    setSelectedStrength(strength);
     getPosition();
   };
-  
+
   useEffect(() => {
-    // This effect runs when the position is updated
-    if (position && isSubmitting) {
+    if (position && selectedStrength) {
       onLogSignal({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
-        strength: strength!,
-        network,
-      }).then(() => {
-        setStrength(null);
+        strength: selectedStrength,
+        network: carrier,
+      }).finally(() => {
+        setSelectedStrength(null);
       });
     }
 
-    if (error && isSubmitting) {
+    if (error && selectedStrength) {
       toast({
         variant: 'destructive',
         title: 'Location Error',
         description: error,
       });
-      // In case of location error, the parent `isSubmitting` state is reset.
+      setSelectedStrength(null); 
     }
-  }, [position, error, isSubmitting, onLogSignal, strength, network, toast]);
-
+  }, [position, error, selectedStrength, onLogSignal, carrier, toast]);
 
   const isLoading = isGeoLoading || isSubmitting;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
         <label className="text-sm font-medium text-muted-foreground">Signal Strength</label>
+        <p className="text-sm text-muted-foreground/80 mb-2">Tap an icon to log your signal.</p>
         <div className="grid grid-cols-4 gap-2 mt-2">
           {strengthLevels.map((level) => (
             <Button
               key={level.value}
-              variant={strength === level.value ? 'default' : 'outline'}
-              onClick={() => setStrength(level.value)}
-              aria-pressed={strength === level.value}
-              className="h-12"
+              variant={selectedStrength === level.value && isLoading ? 'default' : 'outline'}
+              onClick={() => handleStrengthClick(level.value)}
+              disabled={isLoading}
+              aria-pressed={selectedStrength === level.value}
+              className="h-16 flex-col"
             >
-              <level.icon className={cn('h-6 w-6', level.color)} />
-              <span className="sr-only">{level.label}</span>
+              <level.icon className={cn('h-7 w-7', level.color)} />
+              <span className="text-xs mt-1">{level.label}</span>
             </Button>
           ))}
         </div>
       </div>
-      <div>
-        <label htmlFor="network-select" className="text-sm font-medium text-muted-foreground">Carrier</label>
-        <Select value={network} onValueChange={(value) => setNetwork(value as SignalData['network'])}>
-          <SelectTrigger id="network-select" className="mt-2">
-            <SelectValue placeholder="Select carrier" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="T-Mobile">T-Mobile</SelectItem>
-            <SelectItem value="Verizon">Verizon</SelectItem>
-            <SelectItem value="AT&T">AT&T</SelectItem>
-            <SelectItem value="Other">Other</SelectItem>
-          </SelectContent>
-        </Select>
+      
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-muted-foreground">Carrier</span>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" className="text-sm">
+              {carrier}
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56">
+            <RadioGroup 
+                defaultValue={carrier}
+                onValueChange={(value: SignalData['network']) => {
+                    setCarrier(value);
+                    setIsPopoverOpen(false);
+                }}
+            >
+                <div className="space-y-2">
+                    {carriers.map((carrierName) => (
+                        <div className="flex items-center space-x-2" key={carrierName}>
+                            <RadioGroupItem value={carrierName} id={carrierName} />
+                            <Label htmlFor={carrierName}>{carrierName}</Label>
+                        </div>
+                    ))}
+                </div>
+            </RadioGroup>
+          </PopoverContent>
+        </Popover>
       </div>
-      <Button onClick={handleSubmit} disabled={isLoading || !strength} className="w-full">
-        {isLoading ? (isSubmitting ? 'Submitting...' : 'Getting Location...') : 'Log Signal'}
-      </Button>
+
+       {isLoading && (
+        <div className="text-sm text-center text-muted-foreground">
+          {isSubmitting ? 'Submitting...' : 'Getting Location...'}
+        </div>
+      )}
     </div>
   );
 }
