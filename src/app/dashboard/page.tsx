@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { getSignalPoints } from '@/lib/actions';
 import type { SignalData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SimpleHeatmap } from '@/components/dashboard/simple-heatmap';
+import { LeafletHeatmap } from '@/components/dashboard/leaflet-heatmap';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function DashboardPage() {
   const [signalData, setSignalData] = useState<SignalData[]>([]);
@@ -20,14 +21,16 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="relative h-full">
-      {isLoading ? (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm">
-          <Skeleton className="w-full h-full" />
-        </div>
-      ) : (
-        <SimpleHeatmap signalData={signalData} />
-      )}
+    <div className="h-full w-full p-4">
+      <Card className="h-full w-full overflow-hidden">
+        <CardContent className="p-0 h-full">
+            {isLoading ? (
+                <Skeleton className="w-full h-full" />
+            ) : (
+                <LeafletHeatmap signalData={signalData} />
+            )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
