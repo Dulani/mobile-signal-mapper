@@ -3,12 +3,9 @@ import {
   Sidebar,
   SidebarHeader,
   SidebarContent,
-  SidebarFooter,
-  SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/app-logo';
-import { UserNav } from '@/components/user-nav';
 
 export default function DashboardLayout({
   children,
@@ -21,15 +18,9 @@ export default function DashboardLayout({
         <SidebarHeader>
           <div className="flex items-center justify-between">
             <AppLogo />
-            <div className="md:hidden">
-              <UserNav />
-            </div>
           </div>
         </SidebarHeader>
         <SidebarContent>{children}</SidebarContent>
-        <SidebarFooter className="hidden md:flex">
-          <UserNav />
-        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">

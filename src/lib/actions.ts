@@ -1,6 +1,5 @@
 'use server';
 
-import { towerProximityHints } from '@/ai/flows/tower-proximity-hints';
 import { mockSignalData, type SignalData } from './data';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
@@ -41,18 +40,4 @@ export async function logSignalPoint(
   revalidatePath('/dashboard');
 
   return newPoint;
-}
-
-export async function getTowerHints(heatmapData: string): Promise<string> {
-  if (!heatmapData || heatmapData === '[]') {
-    throw new Error('Not enough data to provide hints.');
-  }
-
-  try {
-    const result = await towerProximityHints({ heatmapData });
-    return result.hints;
-  } catch (error) {
-    console.error('Error getting tower hints:', error);
-    throw new Error('Failed to generate hints from AI model.');
-  }
 }

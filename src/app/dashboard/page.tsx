@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { MapView } from '@/components/dashboard/map-view';
 import { SignalLogger } from '@/components/dashboard/signal-logger';
-import { TowerHints } from '@/components/dashboard/tower-hints';
 import { getSignalPoints, logSignalPoint } from '@/lib/actions';
 import type { SignalData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
@@ -49,13 +48,6 @@ export default function DashboardPage() {
                 <SidebarGroupLabel>Log Signal</SidebarGroupLabel>
                 <SidebarGroupContent>
                     <SignalLogger onLogSignal={handleLogSignal} />
-                </SidebarGroupContent>
-            </SidebarGroup>
-            <SidebarSeparator />
-            <SidebarGroup>
-                <SidebarGroupLabel>Analysis</SidebarGroupLabel>
-                <SidebarGroupContent>
-                    <TowerHints signalData={signalData} />
                 </SidebarGroupContent>
             </SidebarGroup>
         </div>

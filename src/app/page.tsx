@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, BarChart, Zap, Wifi } from 'lucide-react';
+import { MapPin, BarChart, Wifi } from 'lucide-react';
 import { AppLogo } from '@/components/app-logo';
 import { placeholderImages } from '@/lib/placeholder-images.json';
 
@@ -54,10 +54,10 @@ export default function LandingPage() {
               Powerful Features for Seamless Connectivity
             </h2>
             <p className="mt-4 text-lg text-foreground/70">
-              From simple data entry to AI-powered insights, SignalMapper has you covered.
+              From simple data entry to insightful visualizations, SignalMapper has you covered.
             </p>
           </div>
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary text-primary-foreground">
@@ -94,19 +94,6 @@ export default function LandingPage() {
               <CardContent>
                 <p className="text-muted-foreground">
                     Record your travel routes to analyze signal consistency and find the most reliable path for staying connected on the go.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="bg-card/50 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary text-primary-foreground">
-                  <Zap className="h-6 w-6" />
-                </div>
-                <CardTitle className="pt-4 font-headline">AI Tower Hints</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Leverage AI to analyze your heatmap and get intelligent hints about the likely locations of nearby cell towers.
                 </p>
               </CardContent>
             </Card>
