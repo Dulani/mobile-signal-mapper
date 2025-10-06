@@ -1,12 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { MapView } from '@/components/dashboard/map-view';
 import { SignalLogger } from '@/components/dashboard/signal-logger';
 import { getSignalPoints, logSignalPoint } from '@/lib/actions';
 import type { SignalData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
-import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarSeparator } from '@/components/ui/sidebar';
+import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SimpleHeatmap } from '@/components/dashboard/simple-heatmap';
 
 export default function DashboardPage() {
   const [signalData, setSignalData] = useState<SignalData[]>([]);
@@ -52,13 +52,13 @@ export default function DashboardPage() {
             </SidebarGroup>
         </div>
       </div>
-      <div className="flex-1 relative">
+      <div className="flex-1 relative bg-muted/20">
         {isLoading ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm">
             <Skeleton className="w-full h-full" />
           </div>
         ) : (
-          <MapView signalData={signalData} />
+          <SimpleHeatmap signalData={signalData} />
         )}
       </div>
        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm border-t p-4">
