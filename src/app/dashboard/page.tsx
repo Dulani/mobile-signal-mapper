@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Dynamically import the Heatmap component only on the client side
-  const Heatmap = useMemo(() => dynamic(() => import('@/components/dashboard/heatmap').then(mod => mod.Heatmap), {
+  const Heatmap = useMemo(() => dynamic(() => import('@/components/dashboard/heatmap'), {
     ssr: false,
     loading: () => <Skeleton className="w-full h-full" />,
   }), []);

@@ -7,7 +7,7 @@ interface HeatmapProps {
   signalData: SignalData[];
 }
 
-export function Heatmap({ signalData }: HeatmapProps) {
+export default function Heatmap({ signalData }: HeatmapProps) {
   if (!signalData || signalData.length === 0) {
     return <p>No data to display.</p>;
   }
