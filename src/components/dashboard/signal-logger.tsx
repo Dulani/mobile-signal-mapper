@@ -36,7 +36,7 @@ interface SignalLoggerProps {
 
 export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
   const [strength, setStrength] = useState<SignalStrength | null>(null);
-  const [network, setNetwork] = useState<SignalData['network']>('4G');
+  const [network, setNetwork] = useState<SignalData['network']>('T-Mobile');
   const { position, error, isLoading: isGeoLoading, getPosition } = useGeolocation();
   const { toast } = useToast();
 
@@ -95,17 +95,16 @@ export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
         </div>
       </div>
       <div>
-        <label htmlFor="network-select" className="text-sm font-medium text-muted-foreground">Network Type</label>
+        <label htmlFor="network-select" className="text-sm font-medium text-muted-foreground">Carrier</label>
         <Select value={network} onValueChange={(value) => setNetwork(value as SignalData['network'])}>
           <SelectTrigger id="network-select" className="mt-2">
-            <SelectValue placeholder="Select network" />
+            <SelectValue placeholder="Select carrier" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="5G">5G</SelectItem>
-            <SelectItem value="4G">4G / LTE</SelectItem>
-            <SelectItem value="3G">3G</SelectItem>
-            <SelectItem value="WiFi">WiFi</SelectItem>
-            <SelectItem value="Unknown">Unknown</SelectItem>
+            <SelectItem value="T-Mobile">T-Mobile</SelectItem>
+            <SelectItem value="Verizon">Verizon</SelectItem>
+            <SelectItem value="AT&T">AT&T</SelectItem>
+            <SelectItem value="Other">Other</SelectItem>
           </SelectContent>
         </Select>
       </div>

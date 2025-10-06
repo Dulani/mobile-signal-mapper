@@ -8,7 +8,7 @@ const signalSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
   strength: z.number().min(1).max(4),
-  network: z.enum(['5G', '4G', '3G', 'WiFi', 'Unknown']),
+  network: z.enum(['T-Mobile', 'Verizon', 'AT&T', 'Other']),
 });
 
 // Mock database
