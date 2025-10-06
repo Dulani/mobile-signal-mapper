@@ -19,6 +19,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'SignalMapper',
   description: 'Map and analyze cell signal strength anywhere.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -32,6 +33,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <meta name="theme-color" content="#1F1A24" />
       </head>
       <body className="font-body antialiased">
         <SidebarProvider>

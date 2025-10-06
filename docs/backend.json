@@ -1,0 +1,243 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the SignalMapper application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "googleId": {
+          "type": "string",
+          "description": "Google ID of the user for authentication purposes."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the user."
+        }
+      },
+      "required": [
+        "id",
+        "googleId",
+        "email",
+        "displayName"
+      ]
+    },
+    "SignalReading": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SignalReading",
+      "type": "object",
+      "description": "Represents a single signal strength reading taken by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the signal reading."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N SignalReading)"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude of the signal reading."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude of the signal reading."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the signal reading.",
+          "format": "date-time"
+        },
+        "networkType": {
+          "type": "string",
+          "description": "Type of network (e.g., 4G, 5G, WiFi)."
+        },
+        "signalStrength": {
+          "type": "number",
+          "description": "Reported signal strength (e.g., 1-5, representing signal bars)."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "latitude",
+        "longitude",
+        "timestamp",
+        "networkType",
+        "signalStrength"
+      ]
+    },
+    "Route": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Route",
+      "type": "object",
+      "description": "Represents a route traveled by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the route."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Route)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the route."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the route."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Start time of the route.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "End time of the route.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "startTime",
+        "endTime"
+      ]
+    },
+    "RoutePoint": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RoutePoint",
+      "type": "object",
+      "description": "Represents a point on a user-defined route, linking to signal readings.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the route point."
+        },
+        "routeId": {
+          "type": "string",
+          "description": "Reference to Route. (Relationship: Route 1:N RoutePoint)"
+        },
+        "signalReadingId": {
+          "type": "string",
+          "description": "Reference to SignalReading. (Relationship: SignalReading 1:1 RoutePoint)"
+        },
+        "order": {
+          "type": "number",
+          "description": "The order of the point in the route (e.g., 1, 2, 3...)."
+        }
+      },
+      "required": [
+        "id",
+        "routeId",
+        "signalReadingId",
+        "order"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Includes Google ID for authentication.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/signalReadings/{signalReadingId}",
+        "definition": {
+          "entityName": "SignalReading",
+          "schema": {
+            "$ref": "#/backend/entities/SignalReading"
+          },
+          "description": "Stores signal readings for each user. Secure access via path-based ownership.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "signalReadingId",
+              "description": "The unique identifier for the signal reading."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/routes/{routeId}",
+        "definition": {
+          "entityName": "Route",
+          "schema": {
+            "$ref": "#/backend/entities/Route"
+          },
+          "description": "Stores route information for each user. Secure access via path-based ownership.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "routeId",
+              "description": "The unique identifier for the route."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/routes/{routeId}/routePoints/{routePointId}",
+        "definition": {
+          "entityName": "RoutePoint",
+          "schema": {
+            "$ref": "#/backend/entities/RoutePoint"
+          },
+          "description": "Stores route points associated with routes, nested under each user's route. Secure access via path-based ownership.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "routeId",
+              "description": "The unique identifier for the route."
+            },
+            {
+              "name": "routePointId",
+              "description": "The unique identifier for the route point."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure data security, scalability, and ease of debugging, while adhering to the principle of Authorization Independence. Data is organized to optimize for the core features of SignalMapper: capturing signal readings, recording routes, and visualizing signal strength on a heatmap. The structure leverages path-based ownership and denormalization to avoid complex security rules and enable secure list operations.\n\n*   **Users Collection:** Stores user profiles. Authentication details, including Google ID, are stored here.\n*   **User-Owned Data (Signal Readings and Routes):** Signal readings and routes are stored as subcollections under each user's document (`/users/{userId}/signalReadings/{signalReadingId}` and `/users/{userId}/routes/{routeId}`). This ensures that only the authenticated user has access to their own data.  It also clearly defines the relationship `User 1:N SignalReading` and `User 1:N Route`\n*   **Nested Data (RoutePoints):** RoutePoints are stored as subcollections under each route (`/users/{userId}/routes/{routeId}/routePoints/{routePointId}`). This maintains the hierarchical structure and simplifies access control. It also clearly defines the relationship `Route 1:N RoutePoint`.\n\n**Authorization Independence & QAPs (Rules are not Filters):**\n\n*   **Path-Based Ownership:** All data is nested under the user's document (`/users/{userId}`), providing inherent ownership and enabling simple security rules based on `request.auth.uid == userId`. This eliminates the need for `get()` calls to verify ownership, ensuring Authorization Independence and allowing atomic operations.\n\nThis structure facilitates secure list operations (QAPs) because the rules can directly check `request.auth.uid` against the `userId` path parameter without filtering data based on content. For example, listing signal readings is done via a query on `/users/{userId}/signalReadings`, and the rule simply verifies that `request.auth.uid == userId`."
+  }
+}

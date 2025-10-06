@@ -1,0 +1,129 @@
+/**
+ * @fileoverview Firestore Security Rules for SignalMapper.
+ *
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. Each user
+ * has full control over their own data (SignalReadings, Routes, and RoutePoints)
+ * and cannot access the data of other users.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profiles.
+ * - /users/{userId}/signalReadings/{signalReadingId}: Stores signal readings for each user.
+ * - /users/{userId}/routes/{routeId}: Stores route information for each user.
+ * - /users/{userId}/routes/{routeId}/routePoints/{routePointId}: Stores route points associated with routes.
+ *
+ * Key Security Decisions:
+ * - Users can only create, read, update, and delete their own data.
+ * - Listing of user documents is denied to prevent user enumeration.
+ * - The rules are designed for Authorization Independence, avoiding complex `get()`
+ *   calls and ensuring that rules act as authorization mechanisms, not filters.
+ * - Google Auth is used to identify the user.
+ *
+ * Denormalization for Authorization:  The userId is encoded directly in the path for all
+ * SignalReadings, Routes, and RoutePoints.  This allows for simple, performant ownership checks
+ * without needing to read the document contents.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Protects the /users collection. Only allows a user to create their own profile.  Read, update, and delete are denied.
+     * @path /users/{userId}
+     * @allow create if isSignedIn() && request.auth.uid == userId
+     * @deny get if true
+     * @deny list if true
+     * @deny update if true
+     * @deny delete if true
+     * @principle Enforces user-ownership for user profile creation and prevents unauthorized access.
+     */
+    match /users/{userId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Protects the /users/{userId}/signalReadings collection. Only the owner can create, read, update, and delete signal readings.
+     * @path /users/{userId}/signalReadings/{signalReadingId}
+     * @allow create if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId
+     * @allow get if isSignedIn() && isOwner(userId)
+     * @allow list if isSignedIn() && isOwner(userId)
+     * @allow update if isSignedIn() && isExistingOwner(userId) && request.resource.data.userId == resource.data.userId
+     * @allow delete if isSignedIn() && isExistingOwner(userId)
+     * @deny create if !isSignedIn() || !isOwner(userId) || request.resource.data.userId != userId
+     * @deny get if !isSignedIn() || !isOwner(userId)
+     * @deny list if !isSignedIn() || !isOwner(userId)
+     * @deny update if !isSignedIn() || !isExistingOwner(userId) || request.resource.data.userId != resource.data.userId
+     * @deny delete if !isSignedIn() || !isExistingOwner(userId)
+     * @principle Enforces document ownership for all operations on signal readings.
+     */
+    match /users/{userId}/signalReadings/{signalReadingId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    /**
+     * @description Protects the /users/{userId}/routes collection. Only the owner can create, read, update, and delete routes.
+     * @path /users/{userId}/routes/{routeId}
+     * @allow create if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId
+     * @allow get if isSignedIn() && isOwner(userId)
+     * @allow list if isSignedIn() && isOwner(userId)
+     * @allow update if isSignedIn() && isExistingOwner(userId) && request.resource.data.userId == resource.data.userId
+     * @allow delete if isSignedIn() && isExistingOwner(userId)
+     * @deny create if !isSignedIn() || !isOwner(userId) || request.resource.data.userId != userId
+     * @deny get if !isSignedIn() || !isOwner(userId)
+     * @deny list if !isSignedIn() || !isOwner(userId)
+     * @deny update if !isSignedIn() || !isExistingOwner(userId) || request.resource.data.userId != resource.data.userId
+     * @deny delete if !isSignedIn() || !isExistingOwner(userId)
+     * @principle Enforces document ownership for all operations on routes.
+     */
+    match /users/{userId}/routes/{routeId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    /**
+     * @description Protects the /users/{userId}/routes/{routeId}/routePoints collection. Only the owner can create, read, update, and delete route points.
+     * @path /users/{userId}/routes/{routeId}/routePoints/{routePointId}
+     * @allow create if isSignedIn() && isOwner(userId)
+     * @allow get if isSignedIn() && isOwner(userId)
+     * @allow list if isSignedIn() && isOwner(userId)
+     * @allow update if isSignedIn() && isExistingOwner(userId)
+     * @allow delete if isSignedIn() && isExistingOwner(userId)
+     * @deny create if !isSignedIn() || !isOwner(userId)
+     * @deny get if !isSignedIn() || !isOwner(userId)
+     * @deny list if !isSignedIn() || !isOwner(userId)
+     * @deny update if !isSignedIn() || !isExistingOwner(userId)
+     * @deny delete if !isSignedIn() || !isExistingOwner(userId)
+     * @principle Enforces document ownership for all operations on route points.
+     */
+    match /users/{userId}/routes/{routeId}/routePoints/{routePointId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isExistingOwner(userId);
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+    }
+  }
+}
