@@ -6,7 +6,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import dynamic from 'next/dynamic';
 
-// Dynamically import the LeafletHeatmap component with SSR turned off
 const LeafletHeatmap = dynamic(
   () => import('@/components/dashboard/leaflet-heatmap').then(mod => mod.LeafletHeatmap),
   { 
@@ -36,8 +35,12 @@ export default function DashboardPage() {
         <CardContent className="p-0 h-full">
             {isLoading ? (
                 <Skeleton className="w-full h-full" />
-            ) : (
+            ) : signalData.length > 0 ? (
                 <LeafletHeatmap signalData={signalData} />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-muted">
+                <p className="text-muted-foreground">No signal data logged yet. Start logging to see your heatmap!</p>
+              </div>
             )}
         </CardContent>
       </Card>

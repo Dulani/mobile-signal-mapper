@@ -19,8 +19,8 @@ const getDotColor = (strength: number) => {
   }
 };
 
-function MapComponent({ signalData }: LeafletHeatmapProps) {
-  // Calculate the center of all points to focus the map
+export function LeafletHeatmap({ signalData }: LeafletHeatmapProps) {
+    // Calculate the center of all points to focus the map
   const centerLat = signalData.reduce((acc, p) => acc + p.latitude, 0) / signalData.length;
   const centerLng = signalData.reduce((acc, p) => acc + p.longitude, 0) / signalData.length;
   const center: LatLngExpression = [centerLat, centerLng];
@@ -51,17 +51,4 @@ function MapComponent({ signalData }: LeafletHeatmapProps) {
       ))}
     </MapContainer>
   );
-}
-
-
-export function LeafletHeatmap({ signalData }: LeafletHeatmapProps) {
-  if (signalData.length === 0) {
-    return (
-      <div className="flex h-full w-full items-center justify-center bg-muted">
-        <p className="text-muted-foreground">No signal data logged yet. Start logging to see your heatmap!</p>
-      </div>
-    );
-  }
-
-  return <MapComponent signalData={signalData} />;
 }
