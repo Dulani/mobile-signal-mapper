@@ -1,76 +1,37 @@
 'use client';
-import { useMemo, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { LatLngExpression, Map } from 'leaflet';
 import type { SignalData } from '@/lib/data';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface HeatmapProps {
   signalData: SignalData[];
 }
 
-const getDotColor = (strength: number) => {
-  switch (strength) {
-    case 1: return 'red';
-    case 2: return 'orange';
-    case 3: return 'yellow';
-    case 4: return 'green';
-    default: return 'grey';
-  }
-};
-
-const MapUpdater = ({ center, map }: { center: LatLngExpression, map: Map | null }) => {
-  useEffect(() => {
-    if (map) {
-      map.setView(center, map.getZoom());
-    }
-  }, [center, map]);
-  return null;
-};
-
 export function Heatmap({ signalData }: HeatmapProps) {
-  const mapRef = useRef<Map>(null);
-
-  const center: LatLngExpression = useMemo(() => {
-    if (signalData && signalData.length > 0) {
-      const avgLat = signalData.reduce((sum, p) => sum + p.latitude, 0) / signalData.length;
-      const avgLng = signalData.reduce((sum, p) => sum + p.longitude, 0) / signalData.length;
-      return [avgLat, avgLng];
-    }
-    return [34.0522, -118.2437]; // Default center
-  }, [signalData]);
-
   return (
-    <MapContainer
-      ref={mapRef}
-      center={center}
-      zoom={13}
-      scrollWheelZoom={true}
-      style={{ height: '100%', width: '100%' }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <MapUpdater center={center} map={mapRef.current} />
-      {signalData.map((point) => (
-        <CircleMarker
-          key={point.id}
-          center={[point.latitude, point.longitude]}
-          radius={8}
-          pathOptions={{
-            color: getDotColor(point.strength),
-            fillColor: getDotColor(point.strength),
-            fillOpacity: 0.7
-          }}
-        >
-          <Tooltip>
-            Strength: {point.strength}/4 <br />
-            Network: {point.network} <br />
-            Logged: {new Date(point.timestamp).toLocaleString()}
-          </Tooltip>
-        </CircleMarker>
-      ))}
-    </MapContainer>
+    <ScrollArea className="h-full">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Latitude</TableHead>
+            <TableHead>Longitude</TableHead>
+            <TableHead>Strength</TableHead>
+            <TableHead>Network</TableHead>
+            <TableHead>Timestamp</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {signalData.map((point) => (
+            <TableRow key={point.id}>
+              <TableCell>{point.latitude.toFixed(5)}</TableCell>
+              <TableCell>{point.longitude.toFixed(5)}</TableCell>
+              <TableCell>{point.strength}/4</TableCell>
+              <TableCell>{point.network}</TableCell>
+              <TableCell>{new Date(point.timestamp).toLocaleString()}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </ScrollArea>
   );
 }
