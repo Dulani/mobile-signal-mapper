@@ -30,8 +30,10 @@ export function LeafletHeatmap({ signalData }: LeafletHeatmapProps) {
     return [centerLat, centerLng];
   }, [signalData]);
 
+  // key={center.toString()} is a bit of a hack, but it forces a re-render when the center changes
+  // which is what we want when the data changes. This is a common pattern for react-leaflet.
   return (
-    <MapContainer center={center} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+    <MapContainer key={center.toString()} center={center} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
