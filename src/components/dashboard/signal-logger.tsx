@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Signal, SignalHigh, SignalLow, SignalMedium, Wifi } from 'lucide-react';
+import { Signal, SignalHigh, SignalLow, SignalMedium } from 'lucide-react';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import type { SignalData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
@@ -30,77 +30,50 @@ const strengthLevels: {
 ];
 
 interface SignalLoggerProps {
-  onLogSignal: (data: Omit<SignalData, 'id' | 'userId' | 'timestamp'>) => void;
-  isMobile?: boolean;
+  onLogSignal: (data: Omit<SignalData, 'id' | 'userId' | 'timestamp'>) => Promise<void>;
+  isSubmitting: boolean;
 }
 
-export function SignalLogger({ onLogSignal, isMobile = false }: SignalLoggerProps) {
+export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
   const [strength, setStrength] = useState<SignalStrength | null>(null);
   const [network, setNetwork] = useState<SignalData['network']>('4G');
   const { position, error, isLoading: isGeoLoading, getPosition } = useGeolocation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!strength) {
       toast({ variant: 'destructive', title: 'Please select a signal strength.' });
       return;
     }
-
-    setIsSubmitting(true);
+    // We get the position first. The actual submission is handled in the effect below.
     getPosition();
   };
   
-  // This effect runs when the position is updated
-  // We check if it was triggered by a submission attempt
-  useState(() => {
-    if (isSubmitting && position) {
+  useEffect(() => {
+    // This effect runs when the position is updated
+    if (position && isSubmitting) {
       onLogSignal({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         strength: strength!,
         network,
+      }).then(() => {
+        setStrength(null);
       });
-      setIsSubmitting(false);
-      setStrength(null);
     }
 
-    if (isSubmitting && error) {
+    if (error && isSubmitting) {
       toast({
         variant: 'destructive',
         title: 'Location Error',
         description: error,
       });
-      setIsSubmitting(false);
+      // In case of location error, the parent `isSubmitting` state is reset.
     }
-  });
+  }, [position, error, isSubmitting, onLogSignal, strength, network, toast]);
 
 
   const isLoading = isGeoLoading || isSubmitting;
-
-  if (isMobile) {
-    return (
-        <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-4 gap-2">
-              {strengthLevels.map((level) => (
-                <Button
-                  key={level.value}
-                  variant={strength === level.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setStrength(level.value)}
-                  className="flex flex-col h-auto py-2"
-                >
-                  <level.icon className={cn('h-5 w-5', level.color)} />
-                  <span className="text-xs mt-1">{level.label}</span>
-                </Button>
-              ))}
-            </div>
-            <Button onClick={handleSubmit} disabled={isLoading || !strength} className="w-full">
-              {isLoading ? 'Getting Location...' : 'Log Current Signal'}
-            </Button>
-        </div>
-    )
-  }
 
   return (
     <div className="space-y-4">
@@ -137,7 +110,7 @@ export function SignalLogger({ onLogSignal, isMobile = false }: SignalLoggerProp
         </Select>
       </div>
       <Button onClick={handleSubmit} disabled={isLoading || !strength} className="w-full">
-        {isLoading ? 'Getting Location...' : 'Log Signal'}
+        {isLoading ? (isSubmitting ? 'Submitting...' : 'Getting Location...') : 'Log Signal'}
       </Button>
     </div>
   );
