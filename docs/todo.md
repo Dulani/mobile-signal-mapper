@@ -19,6 +19,11 @@ This document tracks the major features and improvements planned for SignalMappe
 
 ## Future Ideas
 
+-   [ ] **Implement Live Data View**
+    -   Add a switch to the logging page that enables a "live view" panel.
+    -   When active, this panel should display the real-time data the app is receiving from the device's GPS: current latitude, longitude, and a timestamp.
+    -   This gives the user confidence that the app is correctly "seeing" their location before they log a point.
+
 -   [ ] **Route Management**
     -   Allow users to start and stop recording a "route."
     -   Display signal data collected along a specific route.
