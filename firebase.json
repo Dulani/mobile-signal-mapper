@@ -1,5 +1,4 @@
 {
-  "project": "mobilesignalmapper",
   "hosting": {
     "source": ".",
     "ignore": [

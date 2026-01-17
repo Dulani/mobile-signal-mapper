@@ -40,3 +40,7 @@ This document tracks the major features and improvements planned for SignalMappe
 
 -   [ ] **Explore Native App Development**
     -   Investigate creating a native iOS/Android application to gain access to OS-level APIs (like CoreTelephony on iOS) for automatic and precise signal strength collection.
+
+-   [ ] **Add AI to your app?**
+    -   The firebase page suggested that it could help you add AI to your apps.  A thought occured to me that we could do a ground-news style summary of the comments.  We could k-means cluster the numeric responses into low, medium, and high (3 clusters).  Then, we could ask an LLM to periodically summarize what each group tends to emphasize (it might offer a slight speedup and a little fun to the process).
+    
