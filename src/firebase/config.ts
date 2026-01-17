@@ -1,8 +1,9 @@
 export const firebaseConfig = {
-  "projectId": "studio-5544125608-640ca",
-  "appId": "1:577128147443:web:298bd40ea7e68f3a52ca86",
-  "apiKey": "AIzaSyC92Pq3INwkHng2_dIju2vEhJZCrxvf4MU",
-  "authDomain": "studio-5544125608-640ca.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "577128147443"
+  apiKey: "AIzaSyAV1u18vvA53ZN1G6FJzhCL88hPZRTG6B0",
+  authDomain: "mobilesignalmapper.firebaseapp.com",
+  projectId: "mobilesignalmapper",
+  storageBucket: "mobilesignalmapper.firebasestorage.app",
+  messagingSenderId: "185216844453",
+  appId: "1:185216844453:web:4819b2585c8a962295834c",
+  measurementId: "G-5LNGDQC7JH"
 };
