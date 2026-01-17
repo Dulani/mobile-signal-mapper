@@ -17,6 +17,8 @@ import { BarChart, MapPin, Info } from 'lucide-react';
 import Link from 'next/link';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AuthButton } from '@/components/auth-button';
+import { DebugAuth } from '@/components/debug-auth';
+import { APP_VERSION } from '@/lib/version';
 
 export const metadata: Metadata = {
   title: 'SignalMapper',
@@ -78,7 +80,7 @@ export default function RootLayout({
               <header className="flex h-14 items-center gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                   <SidebarTrigger className="md:hidden" />
                   <div className="flex-1">
-                      <h1 className="text-lg font-semibold md:text-xl font-headline">SignalMapper</h1>
+                      <h1 title={`Version: ${APP_VERSION}`} className="text-lg font-semibold md:text-xl font-headline cursor-help w-fit">SignalMapper</h1>
                   </div>
                   <AuthButton />
               </header>
@@ -86,6 +88,7 @@ export default function RootLayout({
             </SidebarInset>
           </SidebarProvider>
           <Toaster />
+          <DebugAuth />
         </FirebaseClientProvider>
       </body>
     </html>

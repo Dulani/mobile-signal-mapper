@@ -9,6 +9,7 @@
 - Heatmap Generation: Generate a heatmap-style visualization of signal strength data, with green indicating strong signal and red indicating weak signal, to reveal signal patterns over geographic areas.
 - User Route Mapping: Allow users to record 'travel routes', seeing how consistent their connection is along the routes and if it might be more suitable to travel using different roads.
 - Tower Proximity Hints: Uses an LLM tool to identify areas where cell phone towers are MOST LIKELY to exist given heatmap, so users can explore where cell towers are located.
+- **PWA Capabilities**: The app includes a `manifest.json` for Progressive Web App support. This allows the app to be "installed" on a mobile device's home screen with high-resolution icons (e.g., 192x192 and 512x512), providing a native-like experience.
 
 ## Style Guidelines:
 
@@ -19,3 +20,8 @@
 - Use minimalistic icons to represent signal strength, GPS, and network types. Color-code them based on signal strength (green, yellow, red).
 - Employ a clean, map-centric layout with a clear display of signal strength overlays. Keep the UI uncluttered and intuitive for easy data input and interpretation.
 - Subtle animations to indicate data capture and heatmap updates, providing visual feedback to the user without being distracting.
+
+## Asset Management & Optimization:
+
+- **Image Optimization**: The app utilizes Next.js's built-in image optimization for high-quality hero images and UI assets. This ensures images are automatically resized and compressed for different device types, though it requires a Cloud Function for on-demand processing in Firebase App Hosting.
+- **PWA Assets**: Icons specified in `public/manifest.json` enable the application to appear as a standalone app on mobile devices.

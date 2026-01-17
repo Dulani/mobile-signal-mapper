@@ -71,15 +71,21 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   // Effect to subscribe to Firebase auth state changes
   useEffect(() => {
     if (!auth) {
+      console.log('FirebaseProvider: No auth instance provided');
       setUserAuthState({ user: null, isUserLoading: false, isProcessingRedirect: false, userError: new Error("Auth service not provided.") });
       return;
     }
+
+    console.log('FirebaseProvider: Initializing auth listener');
 
     // Handle the redirect result separately to avoid race conditions
     getRedirectResult(auth)
       .then((result) => {
         if (result?.user) {
+          console.log('FirebaseProvider: Redirect result found', result.user.email);
           setUserAuthState(prevState => ({ ...prevState, user: result.user }));
+        } else {
+            console.log('FirebaseProvider: No redirect result found');
         }
       })
       .catch((error) => {
@@ -87,12 +93,14 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         setUserAuthState(prevState => ({ ...prevState, userError: error }));
       })
       .finally(() => {
+        console.log('FirebaseProvider: Redirect processing finished');
         setUserAuthState(prevState => ({ ...prevState, isProcessingRedirect: false }));
       });
 
     const unsubscribe = onAuthStateChanged(
       auth,
       (firebaseUser) => {
+        console.log('FirebaseProvider: onAuthStateChanged event', firebaseUser?.email);
         setUserAuthState(prevState => ({ ...prevState, user: firebaseUser, isUserLoading: false, userError: null }));
       },
       (error) => {
@@ -107,6 +115,10 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   const contextValue = useMemo((): FirebaseContextState => {
     const servicesAvailable = !!(firebaseApp && firestore && auth);
     const isLoading = userAuthState.isUserLoading || userAuthState.isProcessingRedirect;
+    
+    // Debug log for context value changes (helps identify unnecessary re-renders or state mismatches)
+    // console.log('FirebaseProvider: Context value updated', { isLoading, hasUser: !!userAuthState.user });
+
     return {
       areServicesAvailable: servicesAvailable,
       firebaseApp: servicesAvailable ? firebaseApp : null,
