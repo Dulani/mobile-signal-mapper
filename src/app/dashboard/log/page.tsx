@@ -1,22 +1,44 @@
 'use client';
 import { useState } from 'react';
 import { SignalLogger } from '@/components/dashboard/signal-logger';
-import { logSignalPoint } from '@/lib/actions';
 import type { SignalData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useFirestore, useUser, addDocumentNonBlocking } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { AuthRequired } from '@/components/auth-required';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LogSignalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [lastLoggedPoint, setLastLoggedPoint] = useState<SignalData | null>(null);
+  const [lastLoggedPoint, setLastLoggedPoint] = useState<Omit<SignalData, 'id' | 'userId'> | null>(null);
   const { toast } = useToast();
+  const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
 
   const handleLogSignal = async (data: Omit<SignalData, 'id' | 'userId' | 'timestamp'>) => {
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Not signed in',
+        description: 'You must be signed in to log a signal point.',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
-    setLastLoggedPoint(null);
+    
+    const newPoint = {
+      ...data,
+      userId: user.uid,
+      timestamp: new Date().getTime(),
+    };
+
     try {
-      const newPoint = await logSignalPoint(data);
+      const signalReadingsCol = collection(firestore, 'users', user.uid, 'signalReadings');
+      addDocumentNonBlocking(signalReadingsCol, newPoint);
+      
       setLastLoggedPoint(newPoint);
       toast({
         title: 'Success',
@@ -32,6 +54,18 @@ export default function LogSignalPage() {
         setIsSubmitting(false);
     }
   };
+
+  if (isUserLoading) {
+    return (
+        <div className="flex justify-center items-start p-4 md:p-8">
+            <Skeleton className="w-full max-w-md h-96" />
+        </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthRequired />;
+  }
 
   return (
     <div className="flex justify-center items-start p-4 md:p-8">

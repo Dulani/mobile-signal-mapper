@@ -15,6 +15,8 @@ import {
 import { AppLogo } from '@/components/app-logo';
 import { BarChart, MapPin, Info } from 'lucide-react';
 import Link from 'next/link';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { AuthButton } from '@/components/auth-button';
 
 export const metadata: Metadata = {
   title: 'SignalMapper',
@@ -37,51 +39,54 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossOrigin=""/>
       </head>
       <body className="font-body antialiased">
-        <SidebarProvider>
-          <Sidebar>
-            <SidebarHeader>
-              <AppLogo />
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link href="/">
-                                <MapPin />
-                                Log Signal
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link href="/dashboard">
-                                <BarChart />
-                                Heatmap
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link href="/about">
-                                <Info />
-                                About
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarContent>
-          </Sidebar>
-          <SidebarInset>
-            <header className="flex h-14 items-center gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <SidebarTrigger className="md:hidden" />
-                <div className="flex-1">
-                    <h1 className="text-lg font-semibold md:text-xl font-headline">SignalMapper</h1>
-                </div>
-            </header>
-            <main className="flex-1 overflow-auto">{children}</main>
-          </SidebarInset>
-        </SidebarProvider>
-        <Toaster />
+        <FirebaseClientProvider>
+          <SidebarProvider>
+            <Sidebar>
+              <SidebarHeader>
+                <AppLogo />
+              </SidebarHeader>
+              <SidebarContent>
+                  <SidebarMenu>
+                      <SidebarMenuItem>
+                          <SidebarMenuButton asChild>
+                              <Link href="/">
+                                  <MapPin />
+                                  Log Signal
+                              </Link>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                          <SidebarMenuButton asChild>
+                              <Link href="/dashboard">
+                                  <BarChart />
+                                  Heatmap
+                              </Link>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                          <SidebarMenuButton asChild>
+                              <Link href="/about">
+                                  <Info />
+                                  About
+                              </Link>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                  </SidebarMenu>
+              </SidebarContent>
+            </Sidebar>
+            <SidebarInset>
+              <header className="flex h-14 items-center gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                  <SidebarTrigger className="md:hidden" />
+                  <div className="flex-1">
+                      <h1 className="text-lg font-semibold md:text-xl font-headline">SignalMapper</h1>
+                  </div>
+                  <AuthButton />
+              </header>
+              <main className="flex-1 overflow-auto">{children}</main>
+            </SidebarInset>
+          </SidebarProvider>
+          <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );

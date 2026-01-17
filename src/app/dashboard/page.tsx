@@ -1,31 +1,33 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { getSignalPoints } from '@/lib/actions';
 import type { SignalData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { useUser, useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { AuthRequired } from '@/components/auth-required';
 
 export default function DashboardPage() {
-  const [signalData, setSignalData] = useState<SignalData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
 
-  // Dynamically import the Heatmap component only on the client side
+  const signalPointsQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'signalReadings'),
+      orderBy('timestamp', 'desc')
+    );
+  }, [firestore, user]);
+
+  const { data: signalData, isLoading: isDataLoading } = useCollection<SignalData>(signalPointsQuery);
+
   const Heatmap = useMemo(() => dynamic(() => import('@/components/dashboard/heatmap'), {
     ssr: false,
     loading: () => <Skeleton className="w-full h-full" />,
   }), []);
 
-  useEffect(() => {
-    async function loadData() {
-      setIsLoading(true);
-      const data = await getSignalPoints();
-      setSignalData(data);
-      setIsLoading(false);
-    }
-    loadData();
-  }, []);
-
+  const isLoading = isUserLoading || (user && isDataLoading);
 
   if (isLoading) {
     return (
@@ -39,7 +41,11 @@ export default function DashboardPage() {
     );
   }
 
-  if (signalData.length === 0) {
+  if (!user) {
+    return <AuthRequired />;
+  }
+
+  if (!signalData || signalData.length === 0) {
     return (
        <div className="h-full w-full p-4">
         <Card className="h-full w-full overflow-hidden">
