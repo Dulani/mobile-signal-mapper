@@ -2,7 +2,7 @@
 
 import {
   GoogleAuthProvider,
-  signInWithRedirect,  // Changed from signInWithPopup
+  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase/provider';
@@ -34,7 +34,7 @@ export function AuthButton() {
   const handleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithRedirect(auth, provider); // Changed from signInWithPopup
+      await signInWithPopup(auth, provider);
     } catch (error) {
       console.error('Error signing in with Google', error);
     }
