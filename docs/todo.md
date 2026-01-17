@@ -30,9 +30,13 @@ This document tracks the major features and improvements planned for SignalMappe
     -   Allow users to name and save routes.
 
 -   [ ] **Improved Data Visualization**
+    -   Replace the scatter plot with a true heatmap on an interactive map (e.g., OpenStreetMap or Google Maps).
     -   Enhance the heatmap with more filtering options (e.g., by date, by network carrier).
     -   Explore different chart types or data representations.
 
 -   [ ] **Offline Data Syncing**
     -   Leverage PWA capabilities to store logged points offline when there's no connectivity.
     -   Automatically sync the data to Firestore when the connection is restored.
+
+-   [ ] **Explore Native App Development**
+    -   Investigate creating a native iOS/Android application to gain access to OS-level APIs (like CoreTelephony on iOS) for automatic and precise signal strength collection.
