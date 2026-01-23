@@ -9,44 +9,33 @@ type GeolocationPosition = {
   };
 };
 
-const getMockPosition = (): GeolocationPosition => {
-  // Return a mock position (e.g., downtown Los Angeles)
-  return {
-    coords: {
-      latitude: 34.052235 + (Math.random() - 0.5) * 0.1,
-      longitude: -118.243683 + (Math.random() - 0.5) * 0.1,
-    },
-  };
-};
-
-
 export const useGeolocation = () => {
   const [position, setPosition] = useState<GeolocationPosition | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const getPosition = useCallback(() => {
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported. Using mock location for testing.');
-      setPosition(getMockPosition());
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      setError('Geolocation is not supported by your browser.');
+      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
+    setError(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setPosition(pos as GeolocationPosition);
-        setError(null);
         setIsLoading(false);
       },
       (err) => {
-        setError(`Geolocation failed: ${err.message}. Using mock location for testing.`);
-        setPosition(getMockPosition());
+        setError(`Geolocation failed: ${err.message}. Please enable location services.`);
+        setPosition(null);
         setIsLoading(false);
       },
       {
         enableHighAccuracy: true,
-        timeout: 5000, // Reduced timeout to fail faster
+        timeout: 10000,
         maximumAge: 0,
       }
     );
