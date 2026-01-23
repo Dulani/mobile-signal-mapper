@@ -17,7 +17,6 @@ import { BarChart, MapPin, Info } from 'lucide-react';
 import Link from 'next/link';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AuthButton } from '@/components/auth-button';
-import { DebugAuth } from '@/components/debug-auth';
 import { APP_VERSION } from '@/lib/version';
 
 export const metadata: Metadata = {
@@ -88,7 +87,6 @@ export default function RootLayout({
             </SidebarInset>
           </SidebarProvider>
           <Toaster />
-          <DebugAuth />
         </FirebaseClientProvider>
       </body>
     </html>

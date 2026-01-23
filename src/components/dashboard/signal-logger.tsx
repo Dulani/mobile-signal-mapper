@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Signal, SignalHigh, SignalLow, SignalMedium } from 'lucide-react';
+import { Signal, SignalHigh, SignalLow, SignalMedium, WifiOff } from 'lucide-react';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import type { SignalData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 
-type SignalStrength = 1 | 2 | 3 | 4;
+type SignalStrength = 0 | 1 | 2 | 3 | 4;
 
 const strengthLevels: {
   value: SignalStrength;
@@ -20,6 +20,7 @@ const strengthLevels: {
   color: string;
   label: string;
 }[] = [
+  { value: 0, icon: WifiOff, color: 'text-muted-foreground', label: 'No Signal' },
   { value: 1, icon: SignalLow, color: 'text-red-500', label: 'Weak' },
   { value: 2, icon: SignalMedium, color: 'text-yellow-500', label: 'Fair' },
   { value: 3, icon: SignalHigh, color: 'text-green-500', label: 'Good' },
@@ -46,7 +47,7 @@ export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
   };
 
   useEffect(() => {
-    if (position && selectedStrength) {
+    if (position && selectedStrength !== null) {
       onLogSignal({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
@@ -57,7 +58,7 @@ export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
       });
     }
 
-    if (error && selectedStrength) {
+    if (error && selectedStrength !== null) {
       toast({
         variant: 'destructive',
         title: 'Location Error',
@@ -73,7 +74,7 @@ export function SignalLogger({ onLogSignal, isSubmitting }: SignalLoggerProps) {
     <div className="space-y-6">
       <div>
         <p className="text-sm text-muted-foreground/80 mb-2">Tap an icon to log your signal strength:</p>
-        <div className="grid grid-cols-4 gap-2 mt-2">
+        <div className="grid grid-cols-5 gap-2 mt-2">
           {strengthLevels.map((level) => (
             <Button
               key={level.value}

@@ -51,8 +51,8 @@ export default function Heatmap({ signalData }: HeatmapProps) {
         type: 'ordinal',
         title: 'Signal Strength',
         scale: {
-          domain: [1, 2, 3, 4],
-          range: ['hsl(var(--chart-1))', 'hsl(var(--chart-4))', 'hsl(var(--chart-2))', 'hsl(var(--chart-2))'],
+          domain: [0, 1, 2, 3, 4],
+          range: ['hsl(var(--muted))', 'hsl(var(--chart-1))', 'hsl(var(--chart-4))', 'hsl(var(--chart-2))', 'hsl(var(--chart-2))'],
         },
         legend: {
           labelColor: 'hsl(var(--muted-foreground))',

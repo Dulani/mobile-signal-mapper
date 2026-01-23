@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 const signalSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
-  strength: z.number().min(1).max(4),
+  strength: z.number().min(0).max(4),
   network: z.enum(['T-Mobile', 'Verizon', 'AT&T', 'Other']),
 });
 

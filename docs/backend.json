@@ -64,7 +64,7 @@
         },
         "signalStrength": {
           "type": "number",
-          "description": "Reported signal strength (e.g., 1-5, representing signal bars)."
+          "description": "Reported signal strength (e.g., 0-4, representing signal bars, with 0 being no signal)."
         }
       },
       "required": [
