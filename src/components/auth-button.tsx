@@ -31,13 +31,11 @@ export function AuthButton() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
 
-  const handleSignIn = async () => {
+  const handleSignIn = () => {
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithRedirect(auth, provider);
-    } catch (error) {
-      console.error('Error signing in with Google', error);
-    }
+    signInWithRedirect(auth, provider).catch((error) => {
+      console.error('Error initiating sign-in with Google', error);
+    });
   };
 
   const handleSignOut = async () => {
