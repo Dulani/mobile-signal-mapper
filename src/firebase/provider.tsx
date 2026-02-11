@@ -1,16 +1,33 @@
 'use client';
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
-import { FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
+import { Firestore, getFirestore } from 'firebase/firestore';
+import { Auth, User, onAuthStateChanged, getAuth } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
+import { firebaseConfig } from '@/firebase/config';
+
+
+function initializeFirebase() {
+  if (getApps().length > 0) {
+    return getSdks(getApp());
+  }
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  return getSdks(firebaseApp);
+}
+
+function getSdks(firebaseApp: FirebaseApp) {
+  return {
+    firebaseApp,
+    auth: getAuth(firebaseApp),
+    firestore: getFirestore(firebaseApp)
+  };
+}
+
 
 interface FirebaseProviderProps {
   children: ReactNode;
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
 }
 
 // Internal state for user authentication
@@ -55,11 +72,11 @@ export const FirebaseContext = createContext<FirebaseContextState | undefined>(u
  * FirebaseProvider manages and provides Firebase services and user authentication state.
  */
 export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
-  children,
-  firebaseApp,
-  firestore,
-  auth,
+  children
 }) => {
+  const services = useMemo(() => initializeFirebase(), []);
+  const { firebaseApp, firestore, auth } = services;
+
   const [userAuthState, setUserAuthState] = useState<UserAuthState>({
     user: null,
     isUserLoading: true, // Start loading until first auth event
