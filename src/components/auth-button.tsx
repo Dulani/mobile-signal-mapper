@@ -3,6 +3,7 @@
 import {
   GoogleAuthProvider,
   signInWithRedirect,
+  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase/provider';
@@ -32,17 +33,29 @@ export function AuthButton() {
   const { user, isUserLoading } = useUser();
 
   const handleSignIn = () => {
+    console.log("[AuthButton] Initiating sign-in with Google Redirect");
     const provider = new GoogleAuthProvider();
     signInWithRedirect(auth, provider).catch((error) => {
-      console.error('Error initiating sign-in with Google', error);
+      console.error('[AuthButton] Error initiating sign-in with Google Redirect', error);
+    });
+  };
+
+  const handleSignInPopup = () => {
+    console.log("[AuthButton] Initiating sign-in with Google Popup");
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider).then((result) => {
+        console.log("[AuthButton] Popup sign-in successful:", result.user.email);
+    }).catch((error) => {
+      console.error('[AuthButton] Error initiating sign-in with Google Popup', error);
     });
   };
 
   const handleSignOut = async () => {
     try {
+      console.log("[AuthButton] Signing out");
       await signOut(auth);
     } catch (error) {
-      console.error('Error signing out', error);
+      console.error('[AuthButton] Error signing out', error);
     }
   };
 
@@ -52,10 +65,16 @@ export function AuthButton() {
 
   if (!user) {
     return (
-      <Button onClick={handleSignIn} variant="outline">
-        <LogIn className="mr-2 h-4 w-4" />
-        Sign In
-      </Button>
+      <div className="flex gap-2">
+        <Button onClick={handleSignIn} variant="outline">
+          <LogIn className="mr-2 h-4 w-4" />
+          Sign In (Redirect)
+        </Button>
+        <Button onClick={handleSignInPopup} variant="outline">
+          <LogIn className="mr-2 h-4 w-4" />
+          Sign In (Popup)
+        </Button>
+      </div>
     );
   }
 

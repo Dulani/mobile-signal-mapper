@@ -3,7 +3,7 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 import { Firestore, getFirestore } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged, getAuth } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged, getAuth, getRedirectResult } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 import { firebaseConfig } from '@/firebase/config';
 
@@ -86,17 +86,36 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   // Effect to subscribe to Firebase auth state changes
   useEffect(() => {
     if (!auth) {
+      console.log("[FirebaseProvider] Auth service not provided.");
       setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth service not provided.") });
       return;
     }
+
+    console.log("[FirebaseProvider] Setting up onAuthStateChanged and checking redirect result.");
+
+    // Check for redirect result
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          console.log("[FirebaseProvider] Redirect result received:", result.user.email);
+        } else {
+          console.log("[FirebaseProvider] No redirect result found.");
+        }
+      })
+      .catch((error) => {
+        console.error("[FirebaseProvider] Error getting redirect result:", error);
+        setUserAuthState(prev => ({ ...prev, userError: error }));
+      });
 
     // onAuthStateChanged handles everything, including the result of a redirect.
     const unsubscribe = onAuthStateChanged(
       auth,
       (firebaseUser) => {
+        console.log("[FirebaseProvider] onAuthStateChanged:", firebaseUser ? `User logged in: ${firebaseUser.email}` : "User logged out");
         setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
       },
       (error) => {
+        console.error("[FirebaseProvider] onAuthStateChanged error:", error);
         setUserAuthState({ user: null, isUserLoading: false, userError: error });
       }
     );
