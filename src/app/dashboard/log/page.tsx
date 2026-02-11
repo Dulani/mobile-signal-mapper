@@ -86,7 +86,7 @@ export default function LogSignalPage() {
                 <p><strong>Date:</strong> {new Date(lastLoggedPoint.timestamp).toLocaleDateString()}</p>
                 <p><strong>Time:</strong> {new Date(lastLoggedPoint.timestamp).toLocaleTimeString()}</p>
                 <p><strong>Location:</strong> {lastLoggedPoint.latitude.toFixed(5)}, {lastLoggedPoint.longitude.toFixed(5)}</p>
-                <p><strong>Strength:</strong> {lastLoggedPoint.strength} / 4</p>
+                <p><strong>Strength:</strong> {lastLoggedPoint.strength > 0 ? `${lastLoggedPoint.strength} / 4` : 'No Signal'}</p>
             </CardFooter>
           </>
         )}
