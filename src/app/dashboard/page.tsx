@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import type { SignalData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -7,6 +7,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useUser, useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { AuthRequired } from '@/components/auth-required';
+import { useGeolocation } from '@/hooks/use-geolocation';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -21,6 +24,27 @@ export default function DashboardPage() {
   }, [firestore, user]);
 
   const { data: signalData, isLoading: isDataLoading } = useCollection<SignalData>(signalPointsQuery);
+
+  const [showLocation, setShowLocation] = useState(false);
+  const { position, getPosition } = useGeolocation();
+
+  useEffect(() => {
+    if (showLocation) {
+      getPosition();
+      const interval = setInterval(getPosition, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [showLocation, getPosition]);
+
+  const userCoords = useMemo(() => {
+    if (showLocation && position) {
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      };
+    }
+    return null;
+  }, [showLocation, position]);
 
   const Heatmap = useMemo(() => dynamic(() => import('@/components/dashboard/heatmap'), {
     ssr: false,
@@ -61,9 +85,17 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col h-[calc(100svh-4rem)] w-full p-4 overflow-hidden">
+      <div className="flex items-center justify-end space-x-2 mb-2">
+          <Switch
+            id="show-location"
+            checked={showLocation}
+            onCheckedChange={setShowLocation}
+          />
+          <Label htmlFor="show-location" className="text-sm font-medium">Show My Location</Label>
+      </div>
       <Card className="flex-1 flex flex-col overflow-hidden">
         <CardContent className="flex-1 p-0 relative min-h-0">
-            <Heatmap signalData={signalData} />
+            <Heatmap signalData={signalData} userLocation={userCoords} />
         </CardContent>
       </Card>
     </div>
