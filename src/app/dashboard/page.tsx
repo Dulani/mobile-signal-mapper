@@ -60,9 +60,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col h-full w-full p-4">
+    <div className="flex flex-col h-[calc(100svh-4rem)] w-full p-4 overflow-hidden">
       <Card className="flex-1 flex flex-col overflow-hidden">
-        <CardContent className="flex-1 p-0 relative">
+        <CardContent className="flex-1 p-0 relative min-h-0">
             <Heatmap signalData={signalData} />
         </CardContent>
       </Card>
