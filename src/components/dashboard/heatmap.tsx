@@ -9,26 +9,41 @@ interface HeatmapProps {
 }
 
 export default function Heatmap({ signalData }: HeatmapProps) {
+  // Sanitize data to ensure all fields are present and valid
+  const sanitizedData = useMemo(() => {
+    return (signalData || [])
+      .filter(d => d && typeof d.latitude === 'number' && typeof d.longitude === 'number')
+      .map(d => ({
+        ...d,
+        strength: typeof d.strength === 'number' ? d.strength : 0,
+        // Ensure latitude/longitude are actually numbers and not NaN
+        latitude: isNaN(d.latitude) ? 0 : d.latitude,
+        longitude: isNaN(d.longitude) ? 0 : d.longitude,
+      }));
+  }, [signalData]);
+
   const spec: VisualizationSpec = useMemo(() => ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     description: 'A scatter plot of signal strength readings.',
     width: 'container',
     height: 'container',
     data: {
-      values: signalData,
+      values: sanitizedData,
     },
     mark: {
       type: 'circle',
       size: 100,
       opacity: 0.7,
       tooltip: true,
+      stroke: 'white',
+      strokeWidth: 1,
     },
     encoding: {
       x: {
         field: 'longitude',
         type: 'quantitative',
         title: 'Longitude',
-        scale: { zero: false },
+        scale: { zero: false, padding: 20 },
         axis: {
           labelColor: '#94a3b8', // slate-400 approx
           titleColor: '#f1f5f9', // slate-50 approx
@@ -39,7 +54,7 @@ export default function Heatmap({ signalData }: HeatmapProps) {
         field: 'latitude',
         type: 'quantitative',
         title: 'Latitude',
-        scale: { zero: false },
+        scale: { zero: false, padding: 20 },
         axis: {
           labelColor: '#94a3b8',
           titleColor: '#f1f5f9',
@@ -76,20 +91,26 @@ export default function Heatmap({ signalData }: HeatmapProps) {
     autosize: {
       type: 'fit',
       contains: 'padding'
-    }
-  }), [signalData]);
+    },
+    padding: 10
+  }), [sanitizedData]);
 
-  if (!signalData || signalData.length === 0) {
+  if (!sanitizedData || sanitizedData.length === 0) {
     return (
-        <div className="flex h-full w-full items-center justify-center p-4">
-            <p className="text-muted-foreground">No data to display.</p>
-        </div>
+      <div className="flex h-full w-full items-center justify-center p-4 bg-muted/20">
+        <p className="text-muted-foreground">No valid data points to display.</p>
+      </div>
     );
   }
 
   return (
-    <div className="w-full h-full min-h-[300px]">
-        <Vega spec={spec} renderer="svg" style={{ width: '100%', height: '100%' }} />
+    <div className="w-full h-full min-h-[300px] bg-background flex flex-col items-center justify-center">
+      <Vega
+        spec={spec}
+        renderer="canvas"
+        actions={false}
+        style={{ width: '100%', height: '100%', display: 'block' }}
+      />
     </div>
   );
 }
