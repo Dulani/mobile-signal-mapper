@@ -19,14 +19,16 @@ const mockData: SignalData[] = [
 ];
 
 export default function TestHeatmapPage() {
+  const userLoc = { latitude: 34.0522, longitude: -118.2437 };
+
   return (
     <div className="p-4 space-y-8">
-      <Card className="w-full h-[500px]">
+      <Card className="w-full h-[550px]">
         <CardHeader>
-          <CardTitle>Heatmap Test with Mock Data</CardTitle>
+          <CardTitle>Heatmap Test with Mock Data & User Location</CardTitle>
         </CardHeader>
         <CardContent className="h-[400px] p-0 relative">
-          <Heatmap signalData={mockData} />
+          <Heatmap signalData={mockData} userLocation={userLoc} />
         </CardContent>
       </Card>
 
