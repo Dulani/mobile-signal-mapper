@@ -98,7 +98,7 @@ export default function Heatmap({ signalData, userLocation }: HeatmapProps) {
         },
       },
     },
-    background: 'transparent',
+    background: '#09090b', // Zinc-950 dark background for better contrast with 0-strength points
     config: {
       view: {
         stroke: 'transparent'
@@ -120,7 +120,7 @@ export default function Heatmap({ signalData, userLocation }: HeatmapProps) {
   }
 
   return (
-    <div className="w-full h-full min-h-[300px] bg-background flex flex-col items-center justify-center">
+    <div className="w-full h-full min-h-[300px] bg-[#09090b] flex flex-col items-center justify-center">
       <Vega
         spec={spec}
         renderer="canvas"
