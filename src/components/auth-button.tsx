@@ -3,7 +3,6 @@
 import {
   GoogleAuthProvider,
   signInWithRedirect,
-  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase/provider';
@@ -29,10 +28,14 @@ function getInitials(name: string | null | undefined): string {
 
 
 export function AuthButton() {
-  const auth = useAuth();
+  const auth = useAuth(); // Can be null on initial render
   const { user, isUserLoading } = useUser();
 
   const handleSignIn = () => {
+    if (!auth) {
+        console.error("[AuthButton] Auth service not available yet.");
+        return;
+    }
     console.log("[AuthButton] Initiating sign-in with Google Redirect");
     const provider = new GoogleAuthProvider();
     signInWithRedirect(auth, provider).catch((error) => {
@@ -40,17 +43,11 @@ export function AuthButton() {
     });
   };
 
-  const handleSignInPopup = () => {
-    console.log("[AuthButton] Initiating sign-in with Google Popup");
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider).then((result) => {
-        console.log("[AuthButton] Popup sign-in successful:", result.user.email);
-    }).catch((error) => {
-      console.error('[AuthButton] Error initiating sign-in with Google Popup', error);
-    });
-  };
-
   const handleSignOut = async () => {
+    if (!auth) {
+        console.error("[AuthButton] Auth service not available yet.");
+        return;
+    }
     try {
       console.log("[AuthButton] Signing out");
       await signOut(auth);
@@ -59,22 +56,17 @@ export function AuthButton() {
     }
   };
 
-  if (isUserLoading) {
+  // Wait until both user state is determined AND auth service is initialized
+  if (isUserLoading || !auth) {
     return <Skeleton className="h-10 w-24" />;
   }
 
   if (!user) {
     return (
-      <div className="flex gap-2">
-        <Button onClick={handleSignIn} variant="outline">
-          <LogIn className="mr-2 h-4 w-4" />
-          Sign In (Redirect)
-        </Button>
-        <Button onClick={handleSignInPopup} variant="outline">
-          <LogIn className="mr-2 h-4 w-4" />
-          Sign In (Popup)
-        </Button>
-      </div>
+      <Button onClick={handleSignIn} variant="outline">
+        <LogIn className="mr-2 h-4 w-4" />
+        Sign In
+      </Button>
     );
   }
 

@@ -4,7 +4,7 @@ This document tracks the major features and improvements planned for SignalMappe
 
 ## High Priority
 
--   [ ] **Implement User Authentication with Google**
+-   [x] **Implement User Authentication with Google**
     -   Integrate Firebase Authentication to allow users to sign in with their Google accounts.
     -   Ensure all data (signal points, routes) is scoped to the logged-in user.
     -   Update Firestore security rules to enforce user-specific data access.
@@ -43,4 +43,3 @@ This document tracks the major features and improvements planned for SignalMappe
 
 -   [ ] **Add AI to your app?**
     -   The firebase page suggested that it could help you add AI to your apps.  A thought occured to me that we could do a ground-news style summary of the comments.  We could k-means cluster the numeric responses into low, medium, and high (3 clusters).  Then, we could ask an LLM to periodically summarize what each group tends to emphasize (it might offer a slight speedup and a little fun to the process).
-    
