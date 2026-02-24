@@ -13,10 +13,11 @@ import { Label } from '@/components/ui/label';
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
+  const firestore = useFirestore(); // Can be null on SSR
 
   const signalPointsQuery = useMemoFirebase(() => {
-    if (!user) return null;
+    // Wait until user and firestore are available
+    if (!user || !firestore) return null;
     return query(
       collection(firestore, 'users', user.uid, 'signalReadings'),
       orderBy('timestamp', 'desc')
@@ -51,7 +52,8 @@ export default function DashboardPage() {
     loading: () => <Skeleton className="w-full h-full" />,
   }), []);
 
-  const isLoading = isUserLoading || (user && isDataLoading);
+  // Show loading skeleton if user is loading, firestore is not ready, or data is loading
+  const isLoading = isUserLoading || !firestore || (user && isDataLoading);
 
   if (isLoading) {
     return (

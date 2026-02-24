@@ -2,7 +2,7 @@
 
 SignalMapper is a Progressive Web App (PWA) for crowdsourcing and visualizing cellular signal strength. It allows users to easily log signal quality at their current location, and then view that data on a map to understand cellular coverage patterns.
 
-This project is being developed in collaboration with the App Prototyper AI in Firebase Studio. For best practices on this collaborative workflow, please see [docs/agents.md](docs/agents.md).
+This project is being developed in collaboration with the App Prototyper AI in Firebase Studio and Google's Jules AI app developer. For best practices on this collaborative workflow, please see [docs/agents.md](docs/agents.md).
 
 ## Core Features
 

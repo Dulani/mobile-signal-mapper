@@ -14,15 +14,15 @@ export default function LogSignalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastLoggedPoint, setLastLoggedPoint] = useState<Omit<SignalData, 'id' | 'userId'> | null>(null);
   const { toast } = useToast();
-  const firestore = useFirestore();
+  const firestore = useFirestore(); // Can be null on SSR
   const { user, isUserLoading } = useUser();
 
   const handleLogSignal = async (data: Omit<SignalData, 'id' | 'userId' | 'timestamp'>) => {
-    if (!user) {
+    if (!user || !firestore) { // Guard against null user or firestore
       toast({
         variant: 'destructive',
-        title: 'Not signed in',
-        description: 'You must be signed in to log a signal point.',
+        title: 'Not ready',
+        description: 'You must be signed in and the database must be connected.',
       });
       return;
     }
@@ -55,7 +55,8 @@ export default function LogSignalPage() {
     }
   };
 
-  if (isUserLoading) {
+  // Wait for user to be loaded AND firestore to be initialized
+  if (isUserLoading || !firestore) {
     return (
         <div className="flex justify-center items-start p-4 md:p-8">
             <Skeleton className="w-full max-w-md h-96" />
